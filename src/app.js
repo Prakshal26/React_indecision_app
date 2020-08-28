@@ -2,63 +2,73 @@ console.log('APP.js is running')
 
 //JSX Javascript xml provided by React
 
-var template = (
-    <div>
-        <h1>This is a Indecision App</h1>
-        <p>This is some info</p>
-        <ol>
-            <ul>Item 1</ul>
-            <ul>Item 2</ul>
-        </ol>
-    </div>
-);
+const app = {
+    title:'Indecision App',
+    subtitles: 'Put your life in hands of computer',
+    options:[]
+};
 
-var user = {
-    name:'Mike',
-    age:26,
-    location:'dehradun'
+const onFormSubmit = (e)=> {
+    e.preventDefault()//Whenever someone click form whole page refresh. We can prevent that refresh using preventDefault()
+
+    const option = e.target.elements.option.value //option is the name we have given in form field. So picking it's value.
+    console.log(option)
+    if(option) {
+        app.options.push(option)
+        e.target.elements.option.values ='';
+        render()//As soon as count is updated we should refresh the page to display the latest value.
+    }
 }
-function getLocation(location) {
 
-    if (location)
-        return location;
-    else
-        return 'Unknown';
+const onRemoveAll = () => {
+    app.options = [];
+    render()
 }
-var templateTwo = (
-    <div>
-        <h1>{user.name}</h1>
-        <p>{user.age}</p>
-        <p>Location: {getLocation(user.location)}</p>
-    </div>
-);
 
-//Now above line i.e JSX was introduced in React, but previously below code were used.
-//So we are using bable which will automatically convert the JSX code into old js code like below:
-// var template = /*#__PURE__*/React.createElement("p", {
-//     id: "some id"
-// }, "This is JSX from app,js !");
-//
-//This automatically converted code by bable can be found in scripts/app.js.
-
-var count = 0
-const cou = () => {
-    renderCounterApp()
-    console.log('Count is ',count)
-    count++
+const onMakeDecision = () =>{
+    //Suppose 3 element in options. So math.random generate between 0 and 1. So it will multiply by number of task and then floor function,
+    //as a result a random task will be picked from those three number 1,2,3.
+    const randomNum = Math.floor(Math.random()* app.options.length);
+    const option = app.options[randomNum]
+    alert(option);
 }
 
 var appRoot = document.getElementById('app')
 
-const renderCounterApp = () => {
-    var templateThree = (
+
+
+// We have created a Array and each array element is storing a paragraph tag. If need to store paragraph tag like this we need to specify keys.
+// {[<p key='1'>a</p>,<p key ='2'>b</p>,<p key='3'>c</p>]}
+
+const render = () => {
+
+    var template = (
         <div>
-            <h1>Count: {count}</h1>
-            <button onClick={cou}>+1</button>
+            <h1>{app.title}</h1>
+            {app.subtitles && <p>{app.subtitles}</p>}
+            <p>{app.options.length > 0 ? 'Here are your Options' : 'No Options'}</p>
+            {/* This button will call onMakeDecision function and will give some random task from the list of task already
+            entered by the user. If user has not entered any task then this button should be disabled*/}
+            <button disabled={app.options.length==0} onClick={onMakeDecision}>What should I do</button>
+            <button onClick={onRemoveAll} >Remove All</button>
+
+            <ol>
+                {/* This is a array in JSX. We are traversing for each element of app.options array and storing in option.
+                for each option we are creating an array of li. Since for array of HTML tag we need key so we are making
+                key and value both as the content of map.options array*/}
+                {
+                    app.options.map((option) => {
+                        return <li key ={option}>{option}</li>
+                })
+                }
+            </ol>
+            <form onSubmit={onFormSubmit}>
+                <input type="text"  name = "option" />
+                <button>Add Option</button>
+            </form>
         </div>
     );
-
-    ReactDOM.render(templateThree,appRoot);
-
+    ReactDOM.render(template,appRoot);
 };
-renderCounterApp()
+
+render()

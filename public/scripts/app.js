@@ -4,99 +4,95 @@ console.log('APP.js is running');
 
 //JSX Javascript xml provided by React
 
-var template = React.createElement(
-    'div',
-    null,
-    React.createElement(
-        'h1',
-        null,
-        'This is a Indecision App'
-    ),
-    React.createElement(
-        'p',
-        null,
-        'This is some info'
-    ),
-    React.createElement(
-        'ol',
-        null,
-        React.createElement(
-            'ul',
-            null,
-            'Item 1'
-        ),
-        React.createElement(
-            'ul',
-            null,
-            'Item 2'
-        )
-    )
-);
-
-var user = {
-    name: 'Mike',
-    age: 26,
-    location: 'dehradun'
+var app = {
+    title: 'Indecision App',
+    subtitles: 'Put your life in hands of computer',
+    options: []
 };
-function getLocation(location) {
 
-    if (location) return location;else return 'Unknown';
-}
-var templateTwo = React.createElement(
-    'div',
-    null,
-    React.createElement(
-        'h1',
-        null,
-        user.name
-    ),
-    React.createElement(
-        'p',
-        null,
-        user.age
-    ),
-    React.createElement(
-        'p',
-        null,
-        'Location: ',
-        getLocation(user.location)
-    )
-);
+var onFormSubmit = function onFormSubmit(e) {
+    e.preventDefault(); //Whenever someone click form whole page refresh. We can prevent that refresh using preventDefault()
 
-//Now above line i.e JSX was introduced in React, but previously below code were used.
-//So we are using bable which will automatically convert the JSX code into old js code like below:
-// var template = /*#__PURE__*/React.createElement("p", {
-//     id: "some id"
-// }, "This is JSX from app,js !");
-//
-//This automatically converted code by bable can be found in scripts/app.js.
+    var option = e.target.elements.option.value; //option is the name we have given in form field. So picking it's value.
+    console.log(option);
+    if (option) {
+        app.options.push(option);
+        e.target.elements.option.values = '';
+        render(); //As soon as count is updated we should refresh the page to display the latest value.
+    }
+};
 
-var count = 0;
-var cou = function cou() {
-    renderCounterApp();
-    console.log('Count is ', count);
-    count++;
+var onRemoveAll = function onRemoveAll() {
+    app.options = [];
+    render();
+};
+
+var onMakeDecision = function onMakeDecision() {
+    //Suppose 3 element in options. So math.random generate between 0 and 1. So it will multiply by number of task and then floor function,
+    //as a result a random task will be picked from those three number 1,2,3.
+    var randomNum = Math.floor(Math.random() * app.options.length);
+    var option = app.options[randomNum];
+    alert(option);
 };
 
 var appRoot = document.getElementById('app');
 
-var renderCounterApp = function renderCounterApp() {
-    var templateThree = React.createElement(
+// We have created a Array and each array element is storing a paragraph tag. If need to store paragraph tag like this we need to specify keys.
+// {[<p key='1'>a</p>,<p key ='2'>b</p>,<p key='3'>c</p>]}
+
+var render = function render() {
+
+    var template = React.createElement(
         'div',
         null,
         React.createElement(
             'h1',
             null,
-            'Count: ',
-            count
+            app.title
+        ),
+        app.subtitles && React.createElement(
+            'p',
+            null,
+            app.subtitles
+        ),
+        React.createElement(
+            'p',
+            null,
+            app.options.length > 0 ? 'Here are your Options' : 'No Options'
         ),
         React.createElement(
             'button',
-            { onClick: cou },
-            '+1'
+            { disabled: app.options.length == 0, onClick: onMakeDecision },
+            'What should I do'
+        ),
+        React.createElement(
+            'button',
+            { onClick: onRemoveAll },
+            'Remove All'
+        ),
+        React.createElement(
+            'ol',
+            null,
+            app.options.map(function (option) {
+                return React.createElement(
+                    'li',
+                    { key: option },
+                    option
+                );
+            })
+        ),
+        React.createElement(
+            'form',
+            { onSubmit: onFormSubmit },
+            React.createElement('input', { type: 'text', name: 'option' }),
+            React.createElement(
+                'button',
+                null,
+                'Add Option'
+            )
         )
     );
-
-    ReactDOM.render(templateThree, appRoot);
+    ReactDOM.render(template, appRoot);
 };
-renderCounterApp();
+
+render();
