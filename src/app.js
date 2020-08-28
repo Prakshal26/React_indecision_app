@@ -1,74 +1,117 @@
-console.log('APP.js is running')
+class IndecisionApp extends React.Component {
 
-//JSX Javascript xml provided by React
 
-const app = {
-    title:'Indecision App',
-    subtitles: 'Put your life in hands of computer',
-    options:[]
-};
-
-const onFormSubmit = (e)=> {
-    e.preventDefault()//Whenever someone click form whole page refresh. We can prevent that refresh using preventDefault()
-
-    const option = e.target.elements.option.value //option is the name we have given in form field. So picking it's value.
-    console.log(option)
-    if(option) {
-        app.options.push(option)
-        e.target.elements.option.values ='';
-        render()//As soon as count is updated we should refresh the page to display the latest value.
+    render() {
+        const title = "Indecision App";
+        const subtitle ="Put Your Life in Hands of Computer";
+        const options =['One','Two']
+        return (
+            <div>
+                {/*We are calling Header here. So while calling header we are also passing the property title and subtitle*/}
+                <Header title={title} subtitle={subtitle}/>
+                <Action />
+                <Options options={options}/>
+                <AddOption/>
+            </div>
+        );
     }
 }
 
-const onRemoveAll = () => {
-    app.options = [];
-    render()
+class Header extends React.Component{
+//When Someone uses Header tag this render method will be called Automatically.
+    render() {
+        return (
+            <div>
+                {/*Since Indecision App has called this and it has passed title and subtitle property, so here we are getting that property */}
+                <h1>{this.props.title}</h1>
+                <p>{this.props.subtitle}</p>
+            </div>
+
+        );
+    }
+}
+class Action extends React.Component {
+
+    handlePick() {
+        alert('HandleClick')
+    }
+    render() {
+        return (
+            <div>
+                <button onClick={this.handlePick}>What Should I DO</button>
+            </div>
+        );
+    }
 }
 
-const onMakeDecision = () =>{
-    //Suppose 3 element in options. So math.random generate between 0 and 1. So it will multiply by number of task and then floor function,
-    //as a result a random task will be picked from those three number 1,2,3.
-    const randomNum = Math.floor(Math.random()* app.options.length);
-    const option = app.options[randomNum]
-    alert(option);
-}
+class Options extends React.Component {
 
-var appRoot = document.getElementById('app')
+    constructor(props) {
+        super(props);
+        this.handleRemoveAll = this.handleRemoveAll().bind;
+    }
 
+    handleRemoveAll() {
 
-
-// We have created a Array and each array element is storing a paragraph tag. If need to store paragraph tag like this we need to specify keys.
-// {[<p key='1'>a</p>,<p key ='2'>b</p>,<p key='3'>c</p>]}
-
-const render = () => {
-
-    var template = (
-        <div>
-            <h1>{app.title}</h1>
-            {app.subtitles && <p>{app.subtitles}</p>}
-            <p>{app.options.length > 0 ? 'Here are your Options' : 'No Options'}</p>
-            {/* This button will call onMakeDecision function and will give some random task from the list of task already
-            entered by the user. If user has not entered any task then this button should be disabled*/}
-            <button disabled={app.options.length==0} onClick={onMakeDecision}>What should I do</button>
-            <button onClick={onRemoveAll} >Remove All</button>
-
-            <ol>
-                {/* This is a array in JSX. We are traversing for each element of app.options array and storing in option.
-                for each option we are creating an array of li. Since for array of HTML tag we need key so we are making
-                key and value both as the content of map.options array*/}
+        alert('HandleRemoveAll')
+    }
+    render() {
+        return (
+            <div>
+                <button onClick={this.handleRemoveAll}>Remove All</button>
                 {
-                    app.options.map((option) => {
-                        return <li key ={option}>{option}</li>
+                    //We are getting Options from Indecision App tag and we are traversing each option and for each option we are calling Option.
+                    this.props.options.map((option)=>{
+                     return <Option key={option} optionText={option}/>
                 })
                 }
-            </ol>
-            <form onSubmit={onFormSubmit}>
-                <input type="text"  name = "option" />
-                <button>Add Option</button>
-            </form>
-        </div>
-    );
-    ReactDOM.render(template,appRoot);
-};
+                <p>{this.props.options.length}</p>
+            </div>
 
-render()
+        );
+    }
+}
+
+class Option extends React.Component {
+    render() {
+        return (
+            <div>
+                {this.props.optionText}
+            </div>
+        );
+
+    }
+}
+
+class AddOption extends React.Component {
+
+    handleAddOption(e) {//As it is called on Submitting the form so e will come by default.
+        e.preventDefault()
+
+        let option = e.target.elements.option.value //option is the name of the property for input type text.
+       option =  option.trim()
+        if(option)
+            alert(option)
+    }
+    render() {
+        return (
+
+            <div>
+                <form onSubmit={this.handleAddOption}>
+                    <input type="text" name="option"/>
+                        <button>Add Option</button>
+                </form>
+            </div>
+    );
+    }
+}
+
+//As soon as jsx template will render, inside it it will call the IndecisionApp. IndecisionAPp is the class which we have created and it will call
+//render method of it and will print all the details.
+const jsx = (
+    <div>
+        <IndecisionApp/>
+    </div>
+);
+
+ReactDOM.render(jsx, document.getElementById('app'))
